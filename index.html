@@ -1,0 +1,120 @@
+<html>
+<head>
+
+    <link rel="stylesheet" type="text/css" href="resources/style/potree.css"/>
+    <!--<link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" rel="stylesheet" type="text/css"/>-->
+    <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css"/>
+
+    <script type="text/javascript" src="config.js"></script>
+
+    <script type="text/javascript" src="jquery-1.9.1.min.js"></script>
+    <script type="text/javascript" src="jquery-ui-1.10.1.custom.min.js"></script>
+    <script type="text/javascript" src="src/Potree.js"></script>
+    <script type="text/javascript">Potree.importScripts("./");</script>
+
+    <script type="text/javascript">
+        function requestFullscreen(target) {
+            if (target.requestFullScreen) {
+                if (document.fullscreen) {
+                    document.exitFullscreen();
+                } else {
+                    target.requestFullScreen();
+                }
+            } else if (target.mozRequestFullScreen) {
+                if (document.mozFullScreen) {
+                    document.mozCancelFullScreen();
+                } else {
+                    target.mozRequestFullScreen();
+                }
+            } else if (target.webkitRequestFullScreen) {
+                if (document.webkitIsFullScreen) {
+                    document.webkitCancelFullScreen();
+                } else {
+                    target.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
+                }
+            }
+        }
+
+        function init() {
+            var success = Potree.init($('canvas')[0]);
+            if (!success) {
+                return;
+            }
+
+            $("#dialog").dialog({position:"left top", width:50});
+
+            $(function () {
+                $("#sldSize").slider({
+                    min:0.1,
+                    max:2,
+                    step:0.1,
+                    slide:updatePointSize,
+                    change:updatePointSize
+                });
+            });
+
+            var scene = Potree.currentScene;
+//	var cloudURL = "resources/pointClouds/ecosynth/converted/cloud.js";
+            //var cloudURL = "resources/pointClouds/ecosynth/plot_45_48/converted/cloud.js";
+            var cloudURL = "resources/02/cloud.js";
+
+            var light1 = new Light("light1", scene.rootNode);
+            light1.translate(-20, -5, -5);
+            light1.colour = [1, 1, 1];
+
+            var pcoNode = POCLoader.load(cloudURL);
+            scene.rootNode.addChild(pcoNode);
+
+            pcoNode.transform = [-1, 0, 0, 0,
+                0, 0, 1, 0,
+                0, 1, 0, 0,
+                0, 0, 0, 1];
+//	scene.activeCamera.translate(-20,200,5);
+
+            var material = MaterialManager.getMaterial("pointCloud");
+//	material.pointSize = 0.5;
+//	document.getElementById("lblPointSize").innerHTML = material.pointSize;
+            $("#sldSize").slider("value", 0.5);
+            Potree.Settings.LODMultiplicator = 3.0;
+//	material.renderMode = PointCloudRenderMode.FILTERED_SPLAT;
+
+            $('canvas')[0].focus();
+        }
+
+        function updatePointSize() {
+            var material = MaterialManager.getMaterial("pointCloud");
+            var size = $("#sldSize").slider("value");
+            material.pointSize = size;
+            document.getElementById("lblPointSize").innerHTML = size;
+        }
+
+    </script>
+
+</head>
+<body onload="init()" class="claro" style="font-size: 62.5%;">
+<!--ondblclick="requestFullscreen(this)-->
+<div id="workarea" style="width: 100%; height: 100%; z-index: 1;">
+    <canvas id="canvas" width="800" height="600" tabIndex="1">
+        Your Browser does not support WebGL. Try the newest version of Firefox or Google Chrome.
+    </canvas>
+</div>
+
+
+<div id="dialog" title="Settings">
+    <table>
+        <tr>
+            <td>
+                <div>
+                    <span class="label">PointSize: </span><span class="label" id="lblPointSize"></span>
+
+                    <div id="sldSize"></div>
+                </div>
+            </td>
+        </tr>
+    </table>
+</div>
+
+
+
+</body>
+</html>

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <script type="text/javascript" src="jquery-1.4.3.js"></script>
+    <script  type="text/javascript">
+        $(function(){
+            var sum=0;
+            for(var i =0;i< $(".a").length;i++){
+                sum+=parseInt($($(".a")[i]).val());
+            }
+            console.log(sum);
+        });
+    </script>
+</head>
+<body>
+<input value="90" class="a">
+<input value="2" class="a">
+<input value="3" class="a">
+<input value="4" class="a">
+</body>
+</html>
